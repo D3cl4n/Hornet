@@ -36,7 +36,7 @@ namespace Hornet
                     Environment.Exit(1);
                 }
 
-                
+                bool success = util.writeToTemplate(opts.Payload);
             }
         }
 
