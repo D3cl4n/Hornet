@@ -67,9 +67,16 @@ namespace Hornet
             {
                 if (line.Contains("payload[] = {}"))
                 {
-                    line.Replace("{}", finalShellcode);
+                    Console.WriteLine("HEREHEREHERE");
+                    Console.WriteLine(finalShellcode);
+                    string newLine = line.Replace("{}", finalShellcode);
+                    Console.WriteLine(newLine);
+                    output.Add(newLine);
                 }
-                output.Add(line);
+                else 
+                {
+                    output.Add(line);
+                }
             }
 
             return output;
@@ -102,6 +109,15 @@ namespace Hornet
                 if (payload.Equals("calc"))
                 {
                     newCode = writeShellcode(lines, shellcode.calculator);
+                }
+            }
+
+            using (StreamWriter sw = new StreamWriter(templatePath))
+            {
+                foreach (string line in newCode)
+                {
+                    Console.WriteLine(line);
+                    sw.WriteLine(line);
                 }
             }
 
