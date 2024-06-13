@@ -67,10 +67,10 @@ namespace Hornet
             {
                 if (line.Contains("payload[] = {}"))
                 {
-                    Console.WriteLine("HEREHEREHERE");
-                    Console.WriteLine(finalShellcode);
-                    string newLine = line.Replace("{}", finalShellcode);
-                    Console.WriteLine(newLine);
+                    string finalStr = "{" + finalShellcode.Remove(finalShellcode.Length - 1) + "}";
+                    Console.WriteLine("HERE");
+                    Console.WriteLine(finalStr);
+                    string newLine = line.Replace("{}", finalStr);
                     output.Add(newLine);
                 }
                 else 
