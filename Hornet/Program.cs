@@ -11,10 +11,12 @@ namespace Hornet
     {
         public class Options
         {
-            [Option(Required = false, HelpText = "template to use")]
+            [Option(Required = false, HelpText = "payload to use")]
             public string? Payload { get; set; }
             [Option(Required = false, HelpText = "list available payloads")]
             public bool List { get; set; }
+            [Option(Required = false, HelpText = "template to use")]
+            public string? Template { get; set; }
         }
 
         static void RunOptions(Options opts)
@@ -24,10 +26,12 @@ namespace Hornet
             if (opts.List)
             {
                 Console.WriteLine("[+] Available payloads:\n");
-                Console.WriteLine("\t[1] calc");
+                Console.WriteLine("\t[1] calc\n");
+                Console.WriteLine("[+] Available templates:\n");
+                Console.WriteLine("\t[1] simple_xor\n");
             }
 
-            else if (opts.Payload != null)
+            else if (opts.Payload != null && opts.Template != null)
             {
                 Console.WriteLine("[+] Generating payload binary from template");
                 if (!util.payloadList.Contains(opts.Payload)) 
@@ -36,7 +40,7 @@ namespace Hornet
                     Environment.Exit(1);
                 }
 
-                bool success = util.writeToTemplate(opts.Payload);
+                bool success = util.writeToTemplate(opts.Payload, opts.Template);
             }
         }
 

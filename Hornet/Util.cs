@@ -16,6 +16,7 @@ namespace Hornet
         //constructor
         public Util() { }
         public List<string> payloadList = new List<string> { "calc" };
+        public string outputDir = "C:\\Users\\cdecl\\source\\repos\\Hornet\\Hornet\\payloads";
 
         //convert the shellcde to c style bytearray
         private string convertShellcode(string shellcode)
@@ -40,36 +41,18 @@ namespace Hornet
             return finalShellcode;
         }
 
-        //takes the shellcode string as ascii and formats to C bytearray
-        private string FormatShellcode(string shellcode)
-        {
-            int key = 0x90;
-            string newShellcode = String.Empty;
-            for (int i = 1; i < shellcode.Length; i = i + 2)
-            {
-                string curr_byte = shellcode[i-1].ToString() + shellcode[i].ToString();
-                int hex_byte = Convert.ToInt32(curr_byte, 16);
-                int enc_byte = key ^ hex_byte;
-                newShellcode = newShellcode + String.Format("{0:x2}", enc_byte);
-            }
-
-
-            return newShellcode;
-        }
-
         //helper method that writes the shellcode to the template code using String.Replace()
         private List<string> writeShellcode(List<string> templateCode, string shellcode)
         {
+            EncryptionHandler encryptor = new EncryptionHandler();
             List<string> output = new List<string>();
-            string formattedShellcode = FormatShellcode(shellcode);
+            string formattedShellcode = encryptor.OneByteXor(shellcode);
             string finalShellcode = convertShellcode(formattedShellcode);
             foreach(string line in templateCode)
             {
                 if (line.Contains("payload[] = {}"))
                 {
                     string finalStr = "{" + finalShellcode.Remove(finalShellcode.Length - 1) + "}";
-                    Console.WriteLine("HERE");
-                    Console.WriteLine(finalStr);
                     string newLine = line.Replace("{}", finalStr);
                     output.Add(newLine);
                 }
@@ -82,18 +65,23 @@ namespace Hornet
             return output;
         }
 
+
         //public API function that performs writing to template
-        public bool writeToTemplate(string payload)
+        public bool writeToTemplate(string payload, string template)
         {
             bool success = false;
+            string templatePath = String.Empty;
             Shellcode shellcode = new Shellcode();
             List<string> newCode = new List<string>();
-            string templatePath = "C:\\Users\\cdecl\\source\\repos\\Hornet\\Hornet\\template.txt"; //TODO: change this since exe runs form bin/
 
-            if (!File.Exists(templatePath))
+            if (template.Equals("simple_xor"))
             {
-                Console.Error.WriteLine("[!] Template file does not exist");
-                Environment.Exit(1);
+                templatePath = "C:\\Users\\cdecl\\source\\repos\\Hornet\\Hornet\\templates\\simple_xor.c";
+                if (!File.Exists(templatePath))
+                {
+                    Console.WriteLine("[!] Template file does not exist");
+                    Environment.Exit(1);
+                }
             }
 
             using (StreamReader sr = File.OpenText(templatePath))
@@ -112,7 +100,7 @@ namespace Hornet
                 }
             }
 
-            using (StreamWriter sw = new StreamWriter(templatePath))
+            using (StreamWriter sw = new StreamWriter(outputDir + "\\payload.c"))
             {
                 foreach (string line in newCode)
                 {
